@@ -11,7 +11,6 @@
                 </tree>
             </field>
         </record>
-
         <record id="product_family_form_action" model="ir.actions.act_window">
             <field name="name">Family</field>
             <field name="type">ir.actions.act_window</field>
@@ -25,7 +24,6 @@
               </p>
             </field>
         </record> 
-
         <menuitem id="menu_mrp_family_form_action"
             name="Families"
             action="product_family_form_action"
