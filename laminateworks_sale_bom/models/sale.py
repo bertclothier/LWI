@@ -6,7 +6,7 @@ from odoo import api, fields, models, _
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
     
-    bom_ids = fields.Many2many(compute='_compute_bom_ids')
+    bom_ids = fields.Many2many('sale.order', compute='_compute_bom_ids')
     
     @api.depends('order_line.sale_bom')
     def _compute_bom_ids(self):
@@ -45,7 +45,7 @@ class SaleOrder(models.Model):
                 'view_type': 'form',
                 'view_mode': 'tree,form',
                 'res_model': 'mrp.bom',
-                'domain': [('id', '=', self.bom_ids.ids)],
+                'domain': [('id', 'in', self.bom_ids.ids)],
             }
 
 

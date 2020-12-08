@@ -8,7 +8,7 @@ class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
     total_weight = fields.Float(string='Total Weight', compute='_compute_total_weight')
-    bom_sale_id = fields.One2many(comodel_name='sale.order.line', inverse_name='sale_bom', string='Bom Sale Order Line ID')
+    bom_sale_line_ids = fields.One2many(comodel_name='sale.order.line', inverse_name='sale_bom', string='Bom Sale Order Line ID')
     total_bom_cost = fields.Float(string='Total Bom Cost',
                                  compute='_compute_total_cost',
                                  readonly=True)
@@ -35,29 +35,29 @@ class MrpBom(models.Model):
     def laminated_process(self, vals_list):
         values = []
         laminated_group = ['Face', 'Back', 'Core']
-        for i in range(len(vals_list['bom_line_ids'])):
-            for j in range(len(vals_list['bom_line_ids'][i])):
-                if isinstance(vals_list['bom_line_ids'][i][j],dict):
-                    values.append(vals_list['bom_line_ids'][i][j]['group'])
+        for i in range(len(vals_list)):
+            for j in range(len(vals_list[i])):
+                if isinstance(vals_list[i][j],dict):
+                    values.append(vals_list[i][j]['group'])
         if not all(item in values for item in laminated_group):
             raise ValidationError(_('Must select face, back, and core groups'))
 
     @api.model
-    def create(self, vals_list):
-        for vals in vals_list:
-            if 'product_tmpl_id' in vals:
-                product_tmpl_id = self.env['product.template'].browse(vals_list['product_tmpl_id'])
+    def create(self, vals):
+        for val in vals:
+            if 'product_tmpl_id' in val:
+                product_tmpl_id = self.env['product.template'].browse(vals['product_tmpl_id'])
                 if product_tmpl_id.sale_bom_process == 'Laminated Face':
-                    self.laminated_process(vals_list)
-        return super(MrpBom, self).create(vals_list)
+                    self.laminated_process(vals['bom_line_ids'])
+        return super(MrpBom, self).create(vals)
 
     @api.model
     def action_cron_archive_bom(self):
-        bom_mrp_ids = [rec.bom_id for rec in self.env['mrp.production'].search([('state', '!=', 'done')])]
+        bom_mrp_ids = [rec.bom_id for rec in self.env['mrp.production'].search([('state', 'not in',  ['done', 'cancel'])])]
         for record in self.search([]):
-            sale_order = record.env['sale.order'].browse(id.bom_sale_id for id in record)
+            sale_order = record.mapped('bom_sale_line_ids').order_id
             if record.code and sale_order and record not in bom_mrp_ids:
-                for line in sale_order.id:
+                for line in sale_order.order_line:
                     if (line.qty_delivered == line.product_uom_qty == line.qty_invoiced):
                         record.write({'active': False})
                         break
