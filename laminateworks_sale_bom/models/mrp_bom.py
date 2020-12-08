@@ -8,11 +8,11 @@ class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
     total_weight = fields.Float(string='Total Weight', compute='_compute_total_weight')
-    bom_sale_id = fields.Integer(string='Sale Order ID')
+    bom_sale_id = fields.One2many(comodel_name='sale.order.line', inverse_name='sale_bom', string='Bom Sale Order Line ID')
     total_bom_cost = fields.Float(string='Total Bom Cost',
                                  compute='_compute_total_cost',
                                  readonly=True)
-
+    
     @api.depends('bom_line_ids.product_id')
     def _compute_total_cost(self):
         for bom in self:
@@ -53,15 +53,14 @@ class MrpBom(models.Model):
 
     @api.model
     def action_cron_archive_bom(self):
+        bom_mrp_ids = [rec.bom_id for rec in self.env['mrp.production'].search([('state', '!=', 'done')])]
         for record in self.search([]):
             sale_order = record.env['sale.order'].browse(id.bom_sale_id for id in record)
-            mrp_production = record.env['mrp.production'].search([('state', '!=', 'done')])
-            bom_mrp_ids = [rec.bom_id for rec in mrp_production]
-            if record.code and sale_order.id != 0 and record not in bom_mrp_ids:
-                for line in sale_order.order_line:
-                    if (line.qty_delivered == line.product_uom_qty
-                    ) and (line.product_uom_qty == line.qty_invoiced):
+            if record.code and sale_order and record not in bom_mrp_ids:
+                for line in sale_order.id:
+                    if (line.qty_delivered == line.product_uom_qty == line.qty_invoiced):
                         record.write({'active': False})
+                        break
 
 
 class MrpBomLine(models.Model):

@@ -6,6 +6,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="bom_ids" invisible="1"/>
+                </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='price_subtotal']" position="after">
                     <field name="sale_bom" attrs="{'readonly': [('sale_product_bom', '=', False)]}" 
                            context="{'default_product_tmpl_id': product_template_id, 'default_product_qty': product_uom_qty}"/>

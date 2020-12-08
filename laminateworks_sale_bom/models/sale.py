@@ -5,14 +5,20 @@ from odoo import api, fields, models, _
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
-
+    
+    bom_ids = fields.Many2many(compute='_compute_bom_ids')
+    
+    @api.depends('order_line.sale_bom')
+    def _compute_bom_ids(self):
+        for record in self:
+            record.bom_ids = record.mapped('order_line.sale_bom.id')
+    
     @api.model
     def create(self, vals):
         res = super(SaleOrder, self).create(vals)
         for line in res.order_line:
             if line.sale_bom:
                 line.sale_bom.code = '{}-{}'.format(res.name, line.number)
-                line.sale_bom.bom_sale_id = res
         return res
 
     def write(self, values):
@@ -20,7 +26,6 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             if line.sale_bom:
                 line.sale_bom.code = '{}-{}'.format(self.name, line.number)
-                line.sale_bom.bom_sale_id = self
         return res
 
     @api.onchange('order_line')
@@ -40,7 +45,7 @@ class SaleOrder(models.Model):
                 'view_type': 'form',
                 'view_mode': 'tree,form',
                 'res_model': 'mrp.bom',
-                'domain': [('bom_sale_id', '=', self.id)],
+                'domain': [('id', '=', self.bom_ids.ids)],
             }
 
 

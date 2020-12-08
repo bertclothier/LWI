@@ -9,6 +9,9 @@
     'author': 'Odoo Inc',
     'description': """
         Task ID: 2361742
+        - Manage mrp bom from sale order line
+        - Family model for product
+        - Scheduled actions to archive bom based on multiple conditions
     """,
     'category': 'Custom Development',
 
