@@ -55,9 +55,9 @@ class MrpBom(models.Model):
     def action_cron_archive_bom(self):
         bom_mrp_ids = [rec.bom_id for rec in self.env['mrp.production'].search([('state', 'not in',  ['done', 'cancel'])])]
         for record in self.search([]):
-            sale_order = record.mapped('bom_sale_line_ids').order_id
-            if record.code and sale_order and record not in bom_mrp_ids:
-                for line in sale_order.order_line:
+            sale_line_ids = record.mapped('bom_sale_line_ids')
+            if record.code and sale_line_ids and record not in bom_mrp_ids:
+                for line in sale_line_ids:
                     if (line.qty_delivered == line.product_uom_qty == line.qty_invoiced):
                         record.write({'active': False})
                         break
