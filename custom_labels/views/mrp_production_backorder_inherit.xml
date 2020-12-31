@@ -1,0 +1,20 @@
+<!-- <?xml version="1.0" encoding="utf-8"?> -->
+<odoo>
+<data>
+    <record id="mrp_production_backorder_inherit_lwi" model="ir.ui.view">
+        <field name="name">mrp.production.backorder.inherit.lwi</field>
+        <field name="model">mrp.production.backorder</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_backorder_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//p" position="replace">
+                <p>
+                            Create a backorder to process the remaining products later.
+                </p>
+            </xpath>
+            <xpath expr="//button[@name='action_close_mo']" position="attributes">   
+                <attribute name="groups">mrp.group_mrp_manager</attribute>
+            </xpath>
+        </field>
+    </record>
+    </data>
+</odoo>
