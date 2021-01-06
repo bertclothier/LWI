@@ -16,7 +16,7 @@
     'category': 'Custom Development',
 
     # any module necessary for this one to work correctly
-    'depends': ['sale', 'mrp'],
+    'depends': ['sale', 'mrp', 'sale_margin'],
 
     # always loaded
     'data': [

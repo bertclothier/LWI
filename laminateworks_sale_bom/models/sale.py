@@ -7,7 +7,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
     
     bom_ids = fields.Many2many('sale.order', compute='_compute_bom_ids')
-    
+
     @api.depends('order_line.sale_bom')
     def _compute_bom_ids(self):
         for record in self:
@@ -32,11 +32,8 @@ class SaleOrder(models.Model):
     def _recompute_order_line(self):
         for line in self.order_line:
             line._compute_get_number()
-            if line.sale_bom:
-                line._compute_margin_bom()
-            if not line.sale_bom:
-                line.name = line.get_sale_order_line_multiline_description_sale(line.product_id)
-                line.margin = line._compute_margin()
+            # if not line.sale_bom:
+            #     line.name = line.get_sale_order_line_multiline_description_sale(line.product_id)
 
     def related_bom_order(self):
         return {
@@ -57,15 +54,15 @@ class SaleOrderLine(models.Model):
                                         string="Sale BoM Process",
                                         store=False)
     number = fields.Integer(compute='_compute_get_number', store=True)
-    margin = fields.Float(
-        "Margin", compute='_compute_margin_bom',
-        digits='Product Price', store=True, groups="base.group_user")
-
+   
     @api.depends('price_subtotal', 'sale_bom')
-    def _compute_margin_bom(self):
+    def _compute_margin(self):
         for line in self:
-            line.margin = line.price_subtotal - (line.sale_bom.total_bom_cost)
-            line.margin_percent = line.price_subtotal and line.margin/line.price_subtotal
+            if line.sale_bom:
+                line.margin = line.price_subtotal - (line.sale_bom.total_bom_cost)
+                line.margin_percent = line.price_subtotal and line.margin/line.price_subtotal
+            else:
+                super(SaleOrderLine, line)._compute_margin()
 
     @api.depends('order_id')
     def _compute_get_number(self):
@@ -81,7 +78,7 @@ class SaleOrderLine(models.Model):
             if line.sale_bom:
                 string = ''
                 for bom_line in line.sale_bom.bom_line_ids:
-                    if bom_line.group and bom_line.family:
+                    if bom_line.group in ['Face', 'Back', 'Core'] and bom_line.group not in string and bom_line.family:
                         string += bom_line.group + ": " + bom_line.family + "\n"
                 if string and string in line.name:
                     continue

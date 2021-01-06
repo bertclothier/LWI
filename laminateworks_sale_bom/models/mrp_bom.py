@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 class MrpBom(models.Model):
     _inherit = 'mrp.bom'
 
-    total_weight = fields.Float(string='Total Weight', compute='_compute_total_weight')
+    total_weight = fields.Char(string='Total Weight', compute='_compute_total_weight')
     bom_sale_line_ids = fields.One2many(comodel_name='sale.order.line', inverse_name='sale_bom', string='Bom Sale Order Line ID')
     total_bom_cost = fields.Float(string='Total Bom Cost',
                                  compute='_compute_total_cost',
@@ -30,7 +30,8 @@ class MrpBom(models.Model):
             if rec.bom_line_ids:
                 for bom_line in rec.bom_line_ids:
                     bom_weight += bom_line.product_qty * bom_line.weight
-            rec.total_weight = quantity * bom_weight
+            weight = quantity * bom_weight
+            rec.total_weight = str(weight) + " " + "kg"  
 
     def laminated_process(self, vals_list):
         values = []
