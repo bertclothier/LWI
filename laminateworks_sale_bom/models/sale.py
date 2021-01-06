@@ -32,9 +32,7 @@ class SaleOrder(models.Model):
     def _recompute_order_line(self):
         for line in self.order_line:
             line._compute_get_number()
-            # if not line.sale_bom:
-            #     line.name = line.get_sale_order_line_multiline_description_sale(line.product_id)
-
+           
     def related_bom_order(self):
         return {
                 'name': _("Bill of Materials"),
