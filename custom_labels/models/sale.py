@@ -2,6 +2,7 @@
 
 from odoo import fields, models
 
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -12,5 +13,3 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     qty_manuf = fields.Float(string='Quantity Manufactured', store=True, default=0)
-
-    

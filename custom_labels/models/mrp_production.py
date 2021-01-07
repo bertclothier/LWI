@@ -5,11 +5,11 @@ from odoo import fields, models, api
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
     
-    sale_line_id = fields.Many2one(comodel_name='sale.order.line', compute='_get_sale_order_info')
-    sale_id = fields.Many2one(comodel_name='sale.order', compute='_get_sale_order_info')
-    customer_po = fields.Char(compute='_set_caps')
-    product_description = fields.Char(compute='_set_caps')
-    qty_manuf = fields.Float(compute='_compute_qty_manuf')
+    sale_line_id = fields.Many2one(comodel_name='sale.order.line', string='Sale Line ID', compute='_get_sale_order_info')
+    sale_id = fields.Many2one(comodel_name='sale.order', string='Sale Order ID' ,compute='_get_sale_order_info')
+    customer_po = fields.Char(string='Customer PO', compute='_set_caps')
+    product_description = fields.Char(string='Product Description', compute='_set_caps')
+    qty_manuf = fields.Float(string='Quantity Manufactured', compute='_compute_qty_manuf')
     
     @api.depends('sale_line_id.qty_manuf')
     def _compute_qty_manuf(self):
@@ -17,6 +17,7 @@ class MrpProduction(models.Model):
             production.qty_manuf = production.sale_line_id.qty_manuf
 
     def button_mark_done(self):
+        self.ensure_one()
         if not self.env.context.get('button_mark_done_production_ids'):
             self = self.with_context(button_mark_done_production_ids=self.ids)
         res = self._pre_button_mark_done()
@@ -31,6 +32,7 @@ class MrpProduction(models.Model):
 
     @api.depends('sale_line_id')
     def _set_caps(self):
+        self.ensure_one()
         self.customer_po = self.sale_id.customer_po.upper()
         self.product_description = self.sale_line_id.name.upper()
 
