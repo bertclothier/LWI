@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_order_form_inherit_laminate" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit.laminate</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="bom_ids" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_subtotal']" position="after">
+                    <field name="sale_bom" attrs="{'readonly': [('sale_product_bom', '=', False)]}" 
+                           context="{'default_product_tmpl_id': product_template_id, 'default_product_qty': product_uom_qty}"/>
+                    <field name="sale_product_bom" invisible="1"/>
+                    <field name="number" invisible="1"/>
+                </xpath>
+                <xpath expr="//div[hasclass('oe_button_box')]/button" position="after">
+                    <button name="related_bom_order" type="object" class="oe_stat_button" icon="fa-globe icon">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">BoM</span>
+                        </div>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
