@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="label_production_view_custom" inherit_id="mrp.label_production_view" >
+            <xpath expr="//t[@t-translation='off']" position="replace">
+                <t t-translation="off">
+
+^XA
+^FO20,20
+^A0N,30,30^FD<t t-raw="production.product_description.splitlines()[0]" />^FS
+^FO21,20
+^A0N,30,30^FD<t t-raw="production.product_description.splitlines()[0]" />^FS
+<t t-foreach="production.product_description.splitlines()[1:]" t-as="description">
+^FO20,<t t-esc="(description_index) * 30 + 50"/>
+^A0N,30,20^FD<t t-raw="description" />^FS
+</t>
+^FO510,20
+^A0N,30,30^FD<t t-esc="int(item_index + 1 + production.qty_manuf - production.product_qty)"/> of <t t-raw="int(production.sale_line_id.product_uom_qty)" />^FS
+^FO511,20
+^A0N,30,30^FD<t t-esc="int(item_index + 1 + production.qty_manuf - production.product_qty)"/> of <t t-raw="int(production.sale_line_id.product_uom_qty)" />^FS
+^FO440,110
+^A0N,30,20^FDP.O. <t t-raw="production.customer_po" /> ^FS
+^XZ
+    
+                </t>
+            </xpath>
+        </template>
+    </data>
+</odoo>
