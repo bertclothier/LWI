@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <record id="view_order_form_inherit_lwi" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.lwi</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='client_order_ref']" position="after">
+                <field name="customer_po"/>
+            </xpath>
+        </field>
+    </record>
+    </data>
+</odoo>
